@@ -1,0 +1,24 @@
+spring:
+  application:
+    name: screenmatch
+
+  datasource:
+    #url: jdbc:mysql://localhost:3306/app_db?rewriteBatchedStatements=true
+    url: jdbc:postgresql://localhost:5433/series_db
+    username: postgres
+    password: 123456
+    hikari:
+      auto-commit: false
+      maximum-pool-size: 10
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  batch:
+    jdbc:
+      initialize-schema: always

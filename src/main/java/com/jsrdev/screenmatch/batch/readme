@@ -1,0 +1,8 @@
+| Concepto      | Qué es              | Para qué sirve                 |
+| ------------- | ------------------- | ------------------------------ |
+| Job           | El trabajo completo | Importar un CSV                |
+| Step          | Un paso del job     | Leer + insertar                |
+| ItemReader    | Lee datos           | Lee el CSV                     |
+| ItemProcessor | Procesa datos       | Validar (opcional)             |
+| ItemWriter    | Escribe datos       | Insertar en BD                 |
+| Chunk         | Lote                | Controla memoria y transacción |
