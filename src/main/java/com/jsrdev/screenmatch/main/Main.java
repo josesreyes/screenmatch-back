@@ -35,6 +35,7 @@ public class Main {
                 1 - Search for a series
                 2 - Search for episodes
                 3.- Show searched series
+                4.- Search series by title
                 
                 0 - Exit
                 """;
@@ -47,6 +48,7 @@ public class Main {
                 case "1" -> handleSeriesSearch();
                 case "2" -> handleEpisodeSearch();
                 case "3" -> showSearchedSeries();
+                case "4" -> searchSeriesByTitle();
                 case "0" -> {
                     System.out.println("Exiting program...");
                     return;
@@ -54,6 +56,19 @@ public class Main {
                 default -> System.out.println("Invalid option. Please try again.");
             }
         }
+    }
+
+    private void searchSeriesByTitle() {
+        String seriesTitle = readValidSeriesName("Enter the name of the series you want to watch:");
+
+        Series series = repository.findByTitleIgnoreCase(seriesTitle);
+
+        if (series == null) {
+            System.out.println("\nSeries not found");
+            return;
+        }
+
+        System.out.println("\nSeries found: " + series);
     }
 
     private void showSearchedSeries() {
