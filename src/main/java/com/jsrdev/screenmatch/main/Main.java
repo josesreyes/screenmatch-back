@@ -22,6 +22,8 @@ public class Main {
 
     private final SeriesRepository repository;
 
+    List<Series> series = new ArrayList<>();
+
     public Main(SeriesRepository seriesRepository) {
         this.repository = seriesRepository;
     }
@@ -55,9 +57,7 @@ public class Main {
     }
 
     private void showSearchedSeries() {
-        //seriesDataList.forEach(System.out::println);
-
-        List<Series> series = repository.findAll();
+        series = repository.findAll();
         series.stream()
                 .sorted(Comparator.comparing(Series::getGenre))
                 .forEach(System.out::println);
@@ -67,7 +67,7 @@ public class Main {
     // MENU OPTION 1: SERIES SEARCH
     // -----------------------------
     private void handleSeriesSearch() {
-        String seriesName = readValidSeriesName();
+        String seriesName = readValidSeriesName("Enter a series name:");
 
         SeriesData seriesData = fetch(seriesName, Map.of(), SeriesData.class);
 
@@ -81,7 +81,6 @@ public class Main {
             return;
         }
 
-        //seriesDataList.add(seriesData);
         Series series = new Series(seriesData);
 
         repository.save(series);
@@ -92,27 +91,37 @@ public class Main {
     // MENU OPTION 2: EPISODE SEARCH
     // --------------------------------
     private void handleEpisodeSearch() {
-        String seriesName = readValidSeriesName();
+        showSearchedSeries();
+        String seriesName = readValidSeriesName("Enter the name of the series to watch it's episodes:");
 
-        SeriesData seriesData = fetch(seriesName, Map.of(), SeriesData.class);
+        Optional<Series> optionalSeries = series.stream()
+                .filter(s -> s.getTitle().toUpperCase().contains(seriesName.toUpperCase()))
+                .findFirst();
 
-        if (seriesData.totalSeasons() == null) {
+        if (optionalSeries.isEmpty()) {
             System.out.println("\nSeries not found: " + seriesName);
             return;
         }
 
-        List<SeasonData> seasons = loadSeasons(seriesName, seriesData);
-        List<Episode> episodes = buildEpisodeList(seasons);
+        Series seriesFound = optionalSeries.get();
 
-        filterEpisodesByYear(episodes);
-        searchEpisodeByTitle(episodes);
-        showSeasonRatings(episodes);
-        showEpisodeStatistics(episodes);
+        List<SeasonData> seasons = loadSeasons(seriesFound);
+        seasons.forEach(System.out::println);
+
+        List<Episode> episodes = buildEpisodeList(seasons);
+        seriesFound.setEpisodes(episodes);
+
+        repository.save(seriesFound);
+
+        //filterEpisodesByYear(episodes);
+        //searchEpisodeByTitle(episodes);
+        //showSeasonRatings(episodes);
+        //showEpisodeStatistics(episodes);
     }
 
-    private String readValidSeriesName() {
+    private String readValidSeriesName(String message) {
         while (true) {
-            String input = readSeriesName();
+            String input = readSeriesName(message);
 
             if (isEmpty(input)) {
                 System.out.println("\nSeries name cannot be empty. Please try again.");
@@ -126,13 +135,12 @@ public class Main {
     // -----------------------------
     // DATA LOADING METHODS
     // -----------------------------
-    private List<SeasonData> loadSeasons(String seriesName, SeriesData seriesData) {
-        int totalSeasons = Integer.parseInt(seriesData.totalSeasons());
+    private List<SeasonData> loadSeasons(Series series) {
         List<SeasonData> seasons = new ArrayList<>();
 
-        for (int s = 1; s <= totalSeasons; s++) {
+        for (int s = 1; s <= series.getTotalSeasons(); s++) {
             SeasonData seasonData = fetch(
-                    seriesName,
+                    series.getTitle(),
                     Map.of("Season", String.valueOf(s)),
                     SeasonData.class
             );
@@ -212,8 +220,8 @@ public class Main {
         return input == null || input.trim().isEmpty();
     }
 
-    private String readSeriesName() {
-        System.out.println("\nEnter a series name:");
+    private String readSeriesName(String message) {
+        System.out.println("\n" + message);
         return scanner.nextLine();
     }
 
