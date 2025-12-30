@@ -35,6 +35,7 @@ public class Main {
                 4.- Search series by title
                 5.- Find the top 5 series by rating
                 6.- Search series by genre
+                7.- Filter series by season and rating
                 
                 0 - Exit
                 """;
@@ -50,6 +51,7 @@ public class Main {
                 case "4" -> searchSeriesByTitle();
                 case "5" -> searchTop5SeriesByRating();
                 case "6" -> searchSeriesByGenre();
+                case "7" -> filtrarSeriesPorTemporadaYEvaluacion();
                 case "0" -> {
                     System.out.println("Exiting program...");
                     return;
@@ -57,6 +59,19 @@ public class Main {
                 default -> System.out.println("Invalid option. Please try again.");
             }
         }
+    }
+
+    private void filtrarSeriesPorTemporadaYEvaluacion() {
+        System.out.println("\nFilter series with how many seasons? ");
+        var totalSeasons = scanner.nextInt();
+        scanner.nextLine();
+        System.out.println("Evaluation based on which value? ");
+        var rating = scanner.nextDouble();
+        scanner.nextLine();
+        List<Series> filteredSeries = repository.findByTotalSeasonsLessThanEqualAndRatingGreaterThanEqual(totalSeasons, rating);
+        System.out.println("*** Filtered Series ***");
+        filteredSeries.forEach(s ->
+                System.out.println(s.getTitle() + "  - rating: " + s.getRating()));
     }
 
     private void searchSeriesByGenre() {
