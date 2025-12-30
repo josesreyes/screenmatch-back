@@ -36,9 +36,11 @@ public class Main {
                 2 - Search for episodes
                 3.- Show searched series
                 4.- Search series by title
+                5.- Find the top 5 series by rating
                 
                 0 - Exit
                 """;
+        // 6.- Find the top 5 episodes per series by rating
 
         while (true) {
             System.out.println(menu);
@@ -49,6 +51,8 @@ public class Main {
                 case "2" -> handleEpisodeSearch();
                 case "3" -> showSearchedSeries();
                 case "4" -> searchSeriesByTitle();
+                case "5" -> searchTop5SeriesByRating();
+                // case "6" -> searchTop5EpisodesPerSeriesByRating();
                 case "0" -> {
                     System.out.println("Exiting program...");
                     return;
@@ -56,6 +60,27 @@ public class Main {
                 default -> System.out.println("Invalid option. Please try again.");
             }
         }
+    }
+    /*private void searchTop5EpisodesPerSeriesByRating() {
+        showSearchedSeries();
+        String seriesName = readValidSeriesName("Enter the name of the series to watch top 5 episodes by rating:");
+
+        List<Series> seriesList = repository.findTop5EpisodesBySeriesTitleByRatingEpisodes(seriesNameº);
+
+        repository.findAll().stream()
+                .filter(s -> s.getTitle().equalsIgnoreCase(seriesName))
+                .flatMap(s ->
+                        s.getEpisodes().stream()
+                                .filter(e -> !(e.getRating() == 0.0))
+                                .sorted()
+                                .limit(5)
+                ).collect(Collectors.toList())
+                .forEach(s -> System.out.println(s.getEpisode()));
+    } */
+
+    private void searchTop5SeriesByRating() {
+        repository.findTop5ByOrderByRatingDesc().stream()
+                .forEach(System.out::println);
     }
 
     private void searchSeriesByTitle() {
