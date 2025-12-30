@@ -1,9 +1,6 @@
 package com.jsrdev.screenmatch.main;
 
-import com.jsrdev.screenmatch.model.Episode;
-import com.jsrdev.screenmatch.model.SeasonData;
-import com.jsrdev.screenmatch.model.Series;
-import com.jsrdev.screenmatch.model.SeriesData;
+import com.jsrdev.screenmatch.model.*;
 import com.jsrdev.screenmatch.repository.SeriesRepository;
 import com.jsrdev.screenmatch.service.ApiClient;
 import com.jsrdev.screenmatch.service.ConvertData;
@@ -37,10 +34,10 @@ public class Main {
                 3.- Show searched series
                 4.- Search series by title
                 5.- Find the top 5 series by rating
+                6.- Search series by genre
                 
                 0 - Exit
                 """;
-        // 6.- Find the top 5 episodes per series by rating
 
         while (true) {
             System.out.println(menu);
@@ -52,7 +49,7 @@ public class Main {
                 case "3" -> showSearchedSeries();
                 case "4" -> searchSeriesByTitle();
                 case "5" -> searchTop5SeriesByRating();
-                // case "6" -> searchTop5EpisodesPerSeriesByRating();
+                case "6" -> searchSeriesByGenre();
                 case "0" -> {
                     System.out.println("Exiting program...");
                     return;
@@ -61,22 +58,18 @@ public class Main {
             }
         }
     }
-    /*private void searchTop5EpisodesPerSeriesByRating() {
-        showSearchedSeries();
-        String seriesName = readValidSeriesName("Enter the name of the series to watch top 5 episodes by rating:");
 
-        List<Series> seriesList = repository.findTop5EpisodesBySeriesTitleByRatingEpisodes(seriesNameº);
+    private void searchSeriesByGenre() {
+        String entryGenre = readSeriesName("Enter the genre of the series you want to search for.");
+        try {
+            Genre genre = Genre.fromEsp(entryGenre);
 
-        repository.findAll().stream()
-                .filter(s -> s.getTitle().equalsIgnoreCase(seriesName))
-                .flatMap(s ->
-                        s.getEpisodes().stream()
-                                .filter(e -> !(e.getRating() == 0.0))
-                                .sorted()
-                                .limit(5)
-                ).collect(Collectors.toList())
-                .forEach(s -> System.out.println(s.getEpisode()));
-    } */
+            repository.findByGenre(genre).stream()
+                    .forEachOrdered(System.out::println);
+        } catch (IllegalArgumentException ex) {
+            System.err.println(ex.getMessage());
+        }
+    }
 
     private void searchTop5SeriesByRating() {
         repository.findTop5ByOrderByRatingDesc().stream()
