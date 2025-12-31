@@ -21,6 +21,8 @@ public class Main {
 
     List<Series> series = new ArrayList<>();
 
+    Series searchedSeries;
+
     public Main(SeriesRepository seriesRepository) {
         this.repository = seriesRepository;
     }
@@ -36,6 +38,8 @@ public class Main {
                 5.- Find the top 5 series by rating
                 6.- Search series by genre
                 7.- Filter series by season and rating
+                8.- Search episodes by title
+                9.- Top 5 episodes by series
                 
                 0 - Exit
                 """;
@@ -51,7 +55,9 @@ public class Main {
                 case "4" -> searchSeriesByTitle();
                 case "5" -> searchTop5SeriesByRating();
                 case "6" -> searchSeriesByGenre();
-                case "7" -> filtrarSeriesPorTemporadaYEvaluacion();
+                case "7" -> filterSeriesBySeasonAndRatings();
+                case "8" -> searchEpisodeByTitleName();
+                case "9" -> top5episodesBySeries();
                 case "0" -> {
                     System.out.println("Exiting program...");
                     return;
@@ -61,14 +67,38 @@ public class Main {
         }
     }
 
-    private void filtrarSeriesPorTemporadaYEvaluacion() {
+    private void top5episodesBySeries() {
+        searchSeriesByTitle();
+        if (searchedSeries == null) {
+            System.out.println("No series selected.");
+            return;
+        }
+        List<Episode> episodes = repository.top5EpisodesBySeries(searchedSeries, 5);
+        episodes.forEach(System.out::println);
+    }
+
+    private void searchEpisodeByTitleName() {
+        System.out.println("Enter episode name: ");
+        String episodeName = scanner.nextLine();
+
+        List<Episode> episodes = repository.episodesByTitle(episodeName);
+        episodes.forEach( e -> System.out.printf("\nSeries: %s, Season: %s, Episode: %s - %s, Rating: %s",
+                e.getSeries().getTitle(),
+                e.getSeason(),
+                e.getTitle(),
+                e.getEpisode(),
+                e.getRating()));
+    }
+
+    private void filterSeriesBySeasonAndRatings() {
         System.out.println("\nFilter series with how many seasons? ");
         var totalSeasons = scanner.nextInt();
         scanner.nextLine();
-        System.out.println("Evaluation based on which value? ");
+        System.out.println("\nEvaluation based on which value? ");
         var rating = scanner.nextDouble();
         scanner.nextLine();
-        List<Series> filteredSeries = repository.findByTotalSeasonsLessThanEqualAndRatingGreaterThanEqual(totalSeasons, rating);
+        //List<Series> filteredSeries = repository.findByTotalSeasonsLessThanEqualAndRatingGreaterThanEqual(totalSeasons, rating);
+        List<Series> filteredSeries = repository.seriesBySeasonAndRating(totalSeasons, rating);
         System.out.println("*** Filtered Series ***");
         filteredSeries.forEach(s ->
                 System.out.println(s.getTitle() + "  - rating: " + s.getRating()));
@@ -94,14 +124,14 @@ public class Main {
     private void searchSeriesByTitle() {
         String seriesTitle = readValidSeriesName("Enter the name of the series you want to watch:");
 
-        Series series = repository.findByTitleIgnoreCase(seriesTitle);
+        searchedSeries = repository.findByTitleIgnoreCase(seriesTitle);
 
-        if (series == null) {
+        if (searchedSeries == null) {
             System.out.println("\nSeries not found");
             return;
         }
 
-        System.out.println("\nSeries found: " + series);
+        System.out.println("\nSeries found: " + searchedSeries);
     }
 
     private void showSearchedSeries() {

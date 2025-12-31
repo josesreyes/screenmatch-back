@@ -15,7 +15,7 @@ public class Episode {
     private Integer episode;
     private Double rating;
     private LocalDate releaseDate;
-    @ManyToOne
+    @ManyToOne @JoinColumn(name = "series_id")
     private Series series;
 
     public Episode(Integer season, EpisodeData ed) {
