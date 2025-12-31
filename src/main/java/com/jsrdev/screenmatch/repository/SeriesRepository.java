@@ -6,7 +6,6 @@ import com.jsrdev.screenmatch.model.Series;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-import java.util.Collection;
 import java.util.List;
 
 public interface SeriesRepository extends JpaRepository<Series, Long> {
@@ -30,4 +29,7 @@ public interface SeriesRepository extends JpaRepository<Series, Long> {
 
     @Query("SELECT e FROM Series s JOIN s.episodes e WHERE e.title ILIKE %:episodeName%")
     List<Episode> episodesByTitle(String episodeName);
+
+    @Query("SELECT e FROM Series s JOIN s.episodes e WHERE s = :seriesName ORDER BY e.rating DESC LIMIT :top")
+    List<Episode> top5EpisodesBySeries(Series seriesName, int top);
 }
