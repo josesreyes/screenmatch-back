@@ -5,6 +5,7 @@ import com.jsrdev.screenmatch.model.Genre;
 import com.jsrdev.screenmatch.model.Series;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
@@ -32,4 +33,10 @@ public interface SeriesRepository extends JpaRepository<Series, Long> {
 
     @Query("SELECT e FROM Series s JOIN s.episodes e WHERE s = :seriesName ORDER BY e.rating DESC LIMIT :top")
     List<Episode> top5EpisodesBySeries(Series seriesName, int top);
+
+    @Query("SELECT s FROM Series s JOIN s.episodes e GROUP BY s ORDER BY MAX(e.releaseDate) DESC LIMIT 5")
+    List<Series> releases();
+
+    @Query("SELECT e FROM Episode e WHERE e.series.id = :id AND e.season = :season")
+    List<Episode> getEpisodesBySeason(@Param("id") Long id, @Param("season") Long season);
 }

@@ -107,7 +107,7 @@ public class Main {
     private void searchSeriesByGenre() {
         String entryGenre = readSeriesName("Enter the genre of the series you want to search for.");
         try {
-            Genre genre = Genre.fromEsp(entryGenre);
+            Genre genre = Genre.fromEspSafe(entryGenre).orElse(null);
 
             repository.findByGenre(genre).stream()
                     .forEachOrdered(System.out::println);

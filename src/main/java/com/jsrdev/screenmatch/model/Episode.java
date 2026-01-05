@@ -28,6 +28,10 @@ public class Episode {
 
     public Episode() {}
 
+    public Long getId() {
+        return id;
+    }
+
     public Series getSeries() {
         return series;
     }

@@ -1,6 +1,8 @@
 package com.jsrdev.screenmatch.model;
 
 import java.text.Normalizer;
+import java.util.Arrays;
+import java.util.Optional;
 
 public enum Genre {
     ACCION("Action", "Acción"),
@@ -9,8 +11,8 @@ public enum Genre {
     CRIMEN("Crime", "Crimen"),
     DRAMA("Drama", "Drama");
 
-    private String genreOmdb;
-    private String genreEsp;
+    private final String genreOmdb;
+    private final String genreEsp;
 
     Genre(String genreOmdb, String genreEsp) {
         this.genreOmdb = genreOmdb;
@@ -26,14 +28,11 @@ public enum Genre {
         throw new IllegalArgumentException("Genre not found: " + text);
     }
 
-    public static Genre fromEsp(String text) {
+    public static Optional<Genre> fromEspSafe(String text) {
         String normalizedText = normalize(text);
-        for (Genre genre : Genre.values()) {
-            if (normalize(genre.genreEsp).equals(normalizedText)) {
-                return genre;
-            }
-        }
-        throw new IllegalArgumentException("Genre not found: " + text);
+        return Arrays.stream(Genre.values())
+                .filter(g -> normalize(g.genreEsp).equals(normalizedText))
+                .findFirst();
     }
 
     private static String normalize(String input) {
