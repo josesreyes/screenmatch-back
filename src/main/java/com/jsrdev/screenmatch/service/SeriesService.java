@@ -1,11 +1,16 @@
 package com.jsrdev.screenmatch.service;
 
+import com.jsrdev.screenmatch.dto.EpisodeDto;
 import com.jsrdev.screenmatch.dto.SeriesDto;
+import com.jsrdev.screenmatch.mapper.EpisodeMapper;
 import com.jsrdev.screenmatch.mapper.SeriesMapper;
+import com.jsrdev.screenmatch.model.Episode;
+import com.jsrdev.screenmatch.model.Genre;
 import com.jsrdev.screenmatch.model.Series;
 import com.jsrdev.screenmatch.repository.SeriesRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -18,20 +23,56 @@ public class SeriesService {
     }
 
     public List<SeriesDto> getAll() {
-        return getSeriesDto(seriesRepository.findAll());
+        return getSeriesDtoList(seriesRepository.findAll());
     }
 
     public List<SeriesDto> getTop5Series() {
-        return getSeriesDto(seriesRepository.findTop5ByOrderByRatingDesc());
+        return getSeriesDtoList(seriesRepository.findTop5ByOrderByRatingDesc());
     }
 
     public List<SeriesDto> getReleases() {
-        return null;
+        return getSeriesDtoList(seriesRepository.releases());
     }
 
-    private List<SeriesDto> getSeriesDto(List<Series> series) {
+    public SeriesDto getSeriesById(Long id) {
+        return seriesRepository.findById(id)
+                .map(this::getSeriesDto)
+                .orElse(null);
+    }
+
+    private List<SeriesDto> getSeriesDtoList(List<Series> series) {
         return series.stream()
-                .map(SeriesMapper::toSeriesDto)
+                .map(this::getSeriesDto)
                 .collect(Collectors.toList());
+    }
+
+    private SeriesDto getSeriesDto(Series s) {
+        return SeriesMapper.toSeriesDto(s);
+    }
+
+    public List<EpisodeDto> getAllSeasons(Long id) {
+        return seriesRepository.findById(id)
+                .map(s -> getEpisodeDtoList(s.getEpisodes()))
+                .orElse(null);
+    }
+
+    public List<EpisodeDto> getEpisodesBySeason(Long id, Long season) {
+        return getEpisodeDtoList(seriesRepository.getEpisodesBySeason(id, season));
+    }
+
+    private List<EpisodeDto> getEpisodeDtoList(List<Episode> episodes) {
+        return episodes.stream()
+                .map(this::getEpisodeDto)
+                .collect(Collectors.toList());
+    }
+
+    private EpisodeDto getEpisodeDto(Episode episode) {
+        return EpisodeMapper.toEpisodeDto(episode);
+    }
+
+    public List<SeriesDto> getSeriesByGenre(String genre) {
+        return Genre.fromEspSafe(genre)
+                .map(g -> getSeriesDtoList(seriesRepository.findByGenre(g)))
+                .orElse(Collections.emptyList());
     }
 }
