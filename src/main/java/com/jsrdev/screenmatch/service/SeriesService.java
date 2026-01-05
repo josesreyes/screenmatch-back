@@ -75,4 +75,10 @@ public class SeriesService {
                 .map(g -> getSeriesDtoList(seriesRepository.findByGenre(g)))
                 .orElse(Collections.emptyList());
     }
+
+    public List<EpisodeDto> getTop5Episodes(Long id) {
+        return seriesRepository.findById(id)
+                .map(s -> getEpisodeDtoList(seriesRepository.top5EpisodesBySeries(s, 5)))
+                .orElse(null);
+    }
 }
